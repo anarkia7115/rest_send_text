@@ -6,7 +6,7 @@ import requests, json
 config = configparser.ConfigParser()
 config.read("./config.ini")
 
-def get_ner(text):
+def get_ner(text, port=config["SABER"]["port"]):
     """
     Args:
         text - string
@@ -21,7 +21,7 @@ def get_ner(text):
     # api-endpoint 
     URL = "http://{host}:{port}/annotate/text".format(
         host=config["SABER"]["host"],
-        port=config["SABER"]["port"] 
+        port=port
     )
     
     # defining a params dict for the parameters to be sent to the API 

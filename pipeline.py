@@ -3,6 +3,7 @@ import postprocess
 import configparser
 import compute
 import json
+from multiprocessing.pool import Pool
 
 config = configparser.ConfigParser()
 config.read("./config.ini")
@@ -52,6 +53,25 @@ def save_clinical_trails_ner_to_file(nrows=999):
 
     with open(ner_json_path, 'w') as f_json_output:
         for ner_result in ner_result_generator:
+            f_json_output.write(json.dumps(ner_result) + "\n")
+
+
+def save_clinical_trails_ner_to_file_multi_process(nrows=999):
+    ner_json_path = config["PATHS"]["ner_json"]
+    input_file = config["PATHS"]["clinical_trails_csv"]
+
+    key_column_name = 'nct_id'
+    ner_result_generator = compute_ner_from_file_input(
+        input_file=input_file, 
+        nrows=nrows, 
+        key_column_name=key_column_name
+    )
+
+    p = Pool(6)
+
+    with open(ner_json_path, 'w') as f_json_output:
+
+        for ner_result in p.map(next, ner_result_generator):
             f_json_output.write(json.dumps(ner_result) + "\n")
 
 if __name__ == "__main__":

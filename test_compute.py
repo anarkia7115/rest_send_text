@@ -1,4 +1,7 @@
-import unittest
+import unittest, configparser
+
+config = configparser.ConfigParser()
+config.read("./config.ini")
 
 class TestCompute(unittest.TestCase):
 
@@ -14,5 +17,5 @@ class TestCompute(unittest.TestCase):
         sample_text = list(list(clinical_trails_df)[record_idx].values())[col_num]
         self.assertEqual(type(sample_text), str)
 
-        ner_result = compute.get_ner(sample_text)
+        ner_result = compute.get_ner(sample_text, port=config["SABER"]["port"])
         print(ner_result)
