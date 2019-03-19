@@ -56,7 +56,7 @@ def save_clinical_trails_ner_to_file(nrows=999):
             f_json_output.write(json.dumps(ner_result) + "\n")
 
 
-def save_clinical_trails_ner_to_file_multi_process(nrows=999):
+def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
     ner_json_path = config["PATHS"]["ner_json"]
     input_file = config["PATHS"]["clinical_trails_csv"]
 
@@ -67,7 +67,7 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999):
         key_column_name=key_column_name
     )
 
-    p = Pool(6)
+    p = Pool(process_num)
 
     with open(ner_json_path, 'w') as f_json_output:
 
@@ -76,4 +76,18 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999):
 
 if __name__ == "__main__":
     # save_clinical_trails_ner_to_file()
-    save_clinical_trails_ner_to_file_multi_process()
+    import sys
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Decide multiprocess')
+    parser.add_argument('--use_mp', help="use multiprocess", action="store_true")
+    parser.add_argument('-p', '--process_num', help="pool process number", type=int)
+
+    args = parser.parse_args()
+
+    if args.use_mp:
+        print("using multiprocess, process_number is {}".format(args.process_num))
+        save_clinical_trails_ner_to_file_multi_process(process_num=args.process_num)
+    else:
+        print("using single process")
+        save_clinical_trails_ner_to_file()
