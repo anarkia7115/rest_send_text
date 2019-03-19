@@ -75,5 +75,5 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999):
             f_json_output.write(json.dumps(ner_result) + "\n")
 
 if __name__ == "__main__":
-    save_clinical_trails_ner_to_file()
+    # save_clinical_trails_ner_to_file()
     save_clinical_trails_ner_to_file_multi_process()
