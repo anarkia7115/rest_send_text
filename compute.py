@@ -1,4 +1,7 @@
 import configparser
+import time
+import requests, json
+
 
 config = configparser.ConfigParser()
 config.read("./config.ini")
@@ -11,8 +14,9 @@ def get_ner(text):
     Return:
         ner - dict
     """
+    start_time = time.time()
+
     # importing the requests library 
-    import requests, json
     
     # api-endpoint 
     URL = "http://{host}:{port}/annotate/text".format(
@@ -29,4 +33,5 @@ def get_ner(text):
     # r.status_code
     ner_result = r.json() 
     
+    print("--- %s seconds in ner ---" % (time.time() - start_time))
     return ner_result

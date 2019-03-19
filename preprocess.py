@@ -5,17 +5,28 @@ from pathlib import Path
 config = configparser.ConfigParser()
 config.read("./config.ini")
 
-def load_clinical_trails(nrows=9999):
+def load_text_to_dist(file_path, sep="\t"):
+    with open(file_path, encoding="utf8", mode='r') as records:
+        header = records.readline().strip()
+        header = header.split("\t")
+        for record in records:
+            record = record.strip().split("\t")
+            yield dict(zip(header, record))
+
+def load_clinical_trails(nrows=9999, return_type='df', sep="\t"):
     """
     Params:
     Return:
         clinical_trails_df - pd.DataFrame
     """
     clinical_trails_csv = Path(config["PATHS"]["clinical_trails_csv"])
-    clinical_trails_df = pd.read_csv(clinical_trails_csv, sep="\t", nrows=nrows, header=0)
-    return clinical_trails_df
+    if return_type == 'df':
+        clinical_trails_df = pd.read_csv(clinical_trails_csv, sep=sep, nrows=nrows, header=0, encoding='utf8')
+        return clinical_trails_df
+    elif return_type == 'dict':
+        return load_text_to_dist(clinical_trails_csv, sep=sep)
 
-def keep_text_fileds(df: pd.DataFrame=None):
+def keep_text_fileds(rows):
     """
     Params:
         df - pd.DataFrame:
@@ -26,10 +37,33 @@ def keep_text_fileds(df: pd.DataFrame=None):
     """
 
     column_names_of_text = [
+        'nct_id', 
         'condition_or_disease', 
         'detailed_desc', 
         'brief_title', 
         'brief_summary'
     ]
-    return df[column_names_of_text]
+    import types
+    if isinstance(rows, pd.DataFrame):
 
+        for row in rows[column_names_of_text].to_dict(orient='records'):
+            yield row
+    elif isinstance(rows, types.GeneratorType):
+        column_names_of_text = set(column_names_of_text)
+        for row in rows:
+            new_row = dict()
+            for k, v in row.items():
+                if k in column_names_of_text:
+                    new_row[k] = v
+            yield new_row
+    else:
+        raise Exception("unknown type of data")
+
+def load_clinical_trails_text(nrows, returntype, sep='\t'):
+    ct = load_clinical_trails(
+        nrows=nrows, 
+        return_type=returntype, 
+        sep=sep
+    )
+    ct_text = keep_text_fileds(ct)
+    return ct_text

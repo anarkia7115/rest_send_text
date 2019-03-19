@@ -9,8 +9,9 @@ class TestCompute(unittest.TestCase):
         clinical_trails_df = preprocess.load_clinical_trails()
         clinical_trails_df = preprocess.keep_text_fileds(clinical_trails_df)
 
-        col_num = 1
-        sample_text = clinical_trails_df.take([0])[clinical_trails_df.columns[col_num]].values[0]
+        record_idx = 0
+        col_num = 2
+        sample_text = list(list(clinical_trails_df)[record_idx].values())[col_num]
         self.assertEqual(type(sample_text), str)
 
         ner_result = compute.get_ner(sample_text)
