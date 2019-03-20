@@ -70,9 +70,9 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
         key_column_name=key_column_name
     )
 
-    ctx = mp.get_context("home")
+    manager = mp.Manager()
     p = Pool(process_num)
-    q = ctx.Queue()
+    q = manager.Queue()
 
     def put_to_queue(data_generator, some_q):  # worker
         some_q.put(next(data_generator))
