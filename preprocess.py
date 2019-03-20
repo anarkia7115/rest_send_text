@@ -12,7 +12,7 @@ def load_text_to_dist(file_path, num_rows, sep="\t"):
         header = header.split("\t")
         for record in records:
             record = record.strip().split("\t")
-            if row_counter < num_rows:
+            if num_rows is None or row_counter < num_rows:
                 yield dict(zip(header, record))
                 row_counter += 1
             else:
