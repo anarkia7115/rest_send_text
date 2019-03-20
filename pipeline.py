@@ -64,6 +64,7 @@ def compute_ner_for_clinical_trails_multi_process(nrows,
     jobs = []
     
     for _ in range(process_num):
+        print("job started!")
         job = process_pool.map_async(
             partial(
                 compute.process_clinical_trails_row, 
