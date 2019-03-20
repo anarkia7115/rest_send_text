@@ -11,3 +11,4 @@ class TestPipeline(unittest.TestCase):
             # pprint(row)
             row_num += 1
         self.assertEqual(row_num, NUM_OF_ROWS)
+

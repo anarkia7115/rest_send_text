@@ -16,7 +16,7 @@ class TestPreprocess(unittest.TestCase):
         from pprint import pprint
         print(type(clinical_trails_record_generator))
         for record in clinical_trails_record_generator:
-            pprint(record)
+            # pprint(record)
             if i > MAX:
                 break
             i += 1 
@@ -30,7 +30,7 @@ class TestPreprocess(unittest.TestCase):
         from pprint import pprint
         print(type(text_fields_only))
         for record in text_fields_only:
-            pprint(record)
+            # pprint(record)
             if i > MAX:
                 break
             i += 1 
