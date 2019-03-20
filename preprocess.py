@@ -16,7 +16,7 @@ def load_text_to_dist(file_path, num_rows, sep="\t"):
                 yield dict(zip(header, record))
                 row_counter += 1
             else:
-                return
+                break
 
 def load_clinical_trails(nrows=9999, return_type='df', sep="\t"):
     """
