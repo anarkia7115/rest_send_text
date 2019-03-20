@@ -3,7 +3,10 @@ import postprocess
 import configparser
 import compute
 import json
+import multiprocessing as mp
 from multiprocessing.pool import Pool
+from multiprocessing.queues import Queue
+from functools import partial
 
 config = configparser.ConfigParser()
 config.read("./config.ini")
@@ -67,12 +70,36 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
         key_column_name=key_column_name
     )
 
+    ctx = mp.get_context("home")
     p = Pool(process_num)
+    q = ctx.Queue()
 
-    with open(ner_json_path, 'w') as f_json_output:
+    def put_to_queue(data_generator, some_q):  # worker
+        some_q.put(next(data_generator))
 
-        for ner_result in p.map(next, ner_result_generator):
-            f_json_output.write(json.dumps(ner_result) + "\n")
+    def get_from_queue_and_write(some_q, output_file_path):  # listener
+        with open(output_file_path, 'w') as f_json_output:
+
+            ner_result = some_q.get()
+            while ner_result is not None:
+                f_json_output.write(json.dumps(ner_result) + "\n")
+
+    # start up listener
+    p.apply_async(get_from_queue_and_write, args=(q, ner_json_path))
+
+    # start up worker
+    jobs = []
+    for _ in range(process_num):
+        job = p.map_async(partial(put_to_queue, some_q=q), ner_result_generator)
+        jobs.append(job)
+
+    # collect workers
+    for job in jobs:
+        job.get()
+
+    # send ending signal
+    q.put(None)
+    p.close()
 
 if __name__ == "__main__":
     # save_clinical_trails_ner_to_file()
