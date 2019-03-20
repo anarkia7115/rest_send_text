@@ -5,13 +5,18 @@ from pathlib import Path
 config = configparser.ConfigParser()
 config.read("./config.ini")
 
-def load_text_to_dist(file_path, sep="\t"):
+def load_text_to_dist(file_path, num_rows, sep="\t"):
+    row_counter = 0
     with open(file_path, encoding="utf8", mode='r') as records:
         header = records.readline().strip()
         header = header.split("\t")
         for record in records:
             record = record.strip().split("\t")
-            yield dict(zip(header, record))
+            if row_counter < num_rows:
+                yield dict(zip(header, record))
+                row_counter += 1
+            else:
+                return
 
 def load_clinical_trails(nrows=9999, return_type='df', sep="\t"):
     """
@@ -24,7 +29,7 @@ def load_clinical_trails(nrows=9999, return_type='df', sep="\t"):
         clinical_trails_df = pd.read_csv(clinical_trails_csv, sep=sep, nrows=nrows, header=0, encoding='utf8')
         return clinical_trails_df
     elif return_type == 'dict':
-        return load_text_to_dist(clinical_trails_csv, sep=sep)
+        return load_text_to_dist(clinical_trails_csv, num_rows=nrows, sep=sep)
 
 def keep_text_fileds(rows):
     """
