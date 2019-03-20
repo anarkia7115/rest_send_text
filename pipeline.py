@@ -60,6 +60,19 @@ def save_clinical_trails_ner_to_file(nrows=999):
         for ner_result in ner_result_generator:
             f_json_output.write(json.dumps(ner_result) + "\n")
 
+def put_to_queue(data_generator, some_q):  # worker
+    print("getting one record")
+    one_record = next(data_generator)
+    print("record got!")
+    some_q.put(one_record)
+    print("record put!")
+
+def get_from_queue_and_write(some_q, output_file_path):  # listener
+    with open(output_file_path, 'w') as f_json_output:
+
+        ner_result = some_q.get()
+        while ner_result is not None:
+            f_json_output.write(json.dumps(ner_result) + "\n")
 
 def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
     print("using multiprocess, process_number is {}".format(args.process_num))
@@ -77,20 +90,6 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
     manager = mp.Manager()
     p = Pool(process_num)
     q = manager.Queue()
-
-    def put_to_queue(data_generator, some_q):  # worker
-        print("getting one record")
-        one_record = next(data_generator)
-        print("record got!")
-        some_q.put(one_record)
-        print("record put!")
-
-    def get_from_queue_and_write(some_q, output_file_path):  # listener
-        with open(output_file_path, 'w') as f_json_output:
-
-            ner_result = some_q.get()
-            while ner_result is not None:
-                f_json_output.write(json.dumps(ner_result) + "\n")
 
     # start up listener
     print("start listener")
