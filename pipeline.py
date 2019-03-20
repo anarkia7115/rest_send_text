@@ -75,7 +75,11 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
     q = manager.Queue()
 
     def put_to_queue(data_generator, some_q):  # worker
-        some_q.put(next(data_generator))
+        print("getting one record")
+        one_record = next(data_generator)
+        print("record got!")
+        some_q.put(one_record)
+        print("record put!")
 
     def get_from_queue_and_write(some_q, output_file_path):  # listener
         with open(output_file_path, 'w') as f_json_output:
