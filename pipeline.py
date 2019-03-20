@@ -44,6 +44,8 @@ def compute_ner_from_file_input(input_file, nrows, key_column_name, predictor=co
         }
 
 def save_clinical_trails_ner_to_file(nrows=999):
+    print("using single process")
+
     ner_json_path = config["PATHS"]["ner_json"]
     input_file = config["PATHS"]["clinical_trails_csv"]
 
@@ -60,6 +62,8 @@ def save_clinical_trails_ner_to_file(nrows=999):
 
 
 def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
+    print("using multiprocess, process_number is {}".format(args.process_num))
+
     ner_json_path = config["PATHS"]["ner_json"]
     input_file = config["PATHS"]["clinical_trails_csv"]
 
@@ -89,9 +93,11 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
                 f_json_output.write(json.dumps(ner_result) + "\n")
 
     # start up listener
+    print("start listener")
     p.apply_async(get_from_queue_and_write, args=(q, ner_json_path))
 
     # start up worker
+    print("starting worker")
     jobs = []
     for _ in range(process_num):
         job = p.map_async(partial(put_to_queue, some_q=q), ner_result_generator)
@@ -117,8 +123,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.use_mp:
-        print("using multiprocess, process_number is {}".format(args.process_num))
         save_clinical_trails_ner_to_file_multi_process(process_num=args.process_num)
     else:
-        print("using single process")
         save_clinical_trails_ner_to_file()
