@@ -7,15 +7,16 @@ import multiprocessing as mp
 from multiprocessing.pool import Pool
 from multiprocessing.queues import Queue
 from functools import partial
+import data_helpers
 
 config = configparser.ConfigParser()
 config.read("./config.ini")
 
 
-def compute_ner_from_file_input(input_file, nrows, key_column_name, predictor=compute.get_ner):
+def compute_ner_from_file_input(nrows, key_column_name, predictor=compute.get_ner):
     """
     Params:
-        predictor - ner = predictor(input_text)
+        predictor - predictor function: ner = predictor(input_text)
 
     1. load text
     2. process every list, predict ner
@@ -26,18 +27,15 @@ def compute_ner_from_file_input(input_file, nrows, key_column_name, predictor=co
     num_of_rows = 0
 
     for row in ct_text_rows:
-        row_key = None
-        predicted_ners = dict()
-        for col_name, col_val in row.items():
-            if col_name == key_column_name:  # is a key to identify row
-                row_key = col_val
-            else:  # is text, predict
-                ner_result = predictor(col_val)  # predict
-                ner_result = postprocess.ner_result_format(ner_result)  # format
-                predicted_ners[col_name] = ner_result
+
+        row_key, predicted_ners = data_helpers.process_clinical_trails_row(
+            row, key_column_name, predictor
+        )
         assert row_key is not None
+
         num_of_rows += 1
         print("{} rows processed".format(num_of_rows))
+
         yield {
             key_column_name: row_key, 
             "ner": predicted_ners
@@ -51,7 +49,6 @@ def save_clinical_trails_ner_to_file(nrows=999):
 
     key_column_name = 'nct_id'
     ner_result_generator = compute_ner_from_file_input(
-        input_file=input_file, 
         nrows=nrows, 
         key_column_name=key_column_name
     )
@@ -82,7 +79,6 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
 
     key_column_name = 'nct_id'
     ner_result_generator = compute_ner_from_file_input(
-        input_file=input_file, 
         nrows=nrows, 
         key_column_name=key_column_name
     )

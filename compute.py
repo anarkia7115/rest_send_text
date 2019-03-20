@@ -35,3 +35,4 @@ def get_ner(text, port=config["SABER"]["port"]):
     
     print("--- %s seconds in ner ---" % (time.time() - start_time))
     return ner_result
+
