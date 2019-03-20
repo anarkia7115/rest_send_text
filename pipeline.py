@@ -13,7 +13,9 @@ config = configparser.ConfigParser()
 config.read("./config.ini")
 
 
-def compute_ner_from_file_input(nrows, key_column_name, predictor=compute.get_ner):
+def compute_ner_for_clinical_trails(nrows, 
+        key_column_name, 
+        predictor=compute.get_ner):
     """
     Params:
         predictor - predictor function: ner = predictor(input_text)
@@ -48,7 +50,7 @@ def save_clinical_trails_ner_to_file(nrows=999):
     input_file = config["PATHS"]["clinical_trails_csv"]
 
     key_column_name = 'nct_id'
-    ner_result_generator = compute_ner_from_file_input(
+    ner_result_generator = compute_ner_for_clinical_trails(
         nrows=nrows, 
         key_column_name=key_column_name
     )
@@ -78,7 +80,7 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
     input_file = config["PATHS"]["clinical_trails_csv"]
 
     key_column_name = 'nct_id'
-    ner_result_generator = compute_ner_from_file_input(
+    ner_result_generator = compute_ner_for_clinical_trails(
         nrows=nrows, 
         key_column_name=key_column_name
     )
