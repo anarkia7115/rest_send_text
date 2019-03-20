@@ -43,9 +43,9 @@ def compute_ner_for_clinical_trails(nrows,
             "ner": predicted_ners
         }
 
-def compute_ner_for_clinical_trails_multi_process(nrows, 
+def compute_ner_for_clinical_trails_multi_process(
+        nrows, 
         key_column_name,
-        process_num, 
         process_pool:Pool, 
         some_q,
         predictor=compute.get_ner):
@@ -58,25 +58,22 @@ def compute_ner_for_clinical_trails_multi_process(nrows,
     3. yield prediction value
     """
     ct_text_rows = preprocess.load_clinical_trails_text(nrows=nrows, returntype='dict')
+    ct_text_rows = list(ct_text_rows)
 
     # worker async
     print("starting workers")
-    jobs = []
     
-    for _ in range(process_num):
-        print("job started!")
-        job = process_pool.map_async(
-            partial(
-                compute.process_clinical_trails_row, 
-                key_column_name=key_column_name,
-                predictor=predictor, 
-                some_q=some_q), 
-            ct_text_rows)
+    print("job started!")
+    process_pool.map(
+        partial(
+            compute.process_clinical_trails_row, 
+            key_column_name=key_column_name,
+            predictor=predictor, 
+            some_q=some_q), 
+        ct_text_rows)
 
-    # collect workders
-    print("collecting workers")
-    for job in jobs:
-        job.get()
+    # collecting
+    print("job finished!")
 
     # send ending signal
     print("sending end signal")
@@ -88,7 +85,6 @@ def save_clinical_trails_ner_to_file(nrows=999):
     print("using single process")
 
     ner_json_path = config["PATHS"]["ner_json"]
-    input_file = config["PATHS"]["clinical_trails_csv"]
 
     key_column_name = 'nct_id'
     ner_result_generator = compute_ner_for_clinical_trails(
@@ -133,7 +129,6 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
     compute_ner_for_clinical_trails_multi_process(
         nrows, 
         key_column_name, 
-        process_num, 
         p, q)
     
     # finished
@@ -141,6 +136,9 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
 
 
 if __name__ == "__main__":
+    import multiprocessing, logging
+    mpl = multiprocessing.log_to_stderr()
+    mpl.setLevel(logging.INFO)
     # save_clinical_trails_ner_to_file()
     import sys
     import argparse
@@ -148,10 +146,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Decide multiprocess')
     parser.add_argument('--use_mp', help="use multiprocess", action="store_true")
     parser.add_argument('-p', '--process_num', help="pool process number", type=int)
+    parser.add_argument('-n', '--nrows', help="limit row of numbers", type=int, default=None)
 
     args = parser.parse_args()
 
     if args.use_mp:
-        save_clinical_trails_ner_to_file_multi_process(process_num=args.process_num)
+        save_clinical_trails_ner_to_file_multi_process(nrows=args.nrows, process_num=args.process_num)
     else:
-        save_clinical_trails_ner_to_file()
+        save_clinical_trails_ner_to_file(nrows=args.nrows)
