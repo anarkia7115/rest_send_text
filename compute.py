@@ -3,6 +3,7 @@ import time
 import requests, json
 import postprocess
 from multiprocessing import Queue
+import multiprocessing as mp
 
 
 config = configparser.ConfigParser()
@@ -54,6 +55,11 @@ def process_clinical_trails_row(
         predicted_ners - analyzed row
 
     """
+
+    cpname = mp.current_process().name
+    # print cpname
+    print("{0} is currently doing...".format(cpname))
+
     predicted_ners = dict()
     for col_name, col_val in row.items():
         if col_name == key_column_name:  # is a key to identify row
