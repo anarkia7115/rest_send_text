@@ -78,9 +78,9 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
     p = Pool(process_num)
     q = manager.Queue()
 
-    def put_to_queue(one_record, some_q):  # worker
+    def put_to_queue(data_generator, some_q):  # worker
         print("getting one record")
-        # one_record = next(data_generator)
+        one_record = next(data_generator)
         print("record got!")
         some_q.put(one_record)
         print("record put!")
@@ -100,7 +100,7 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
     print("starting worker")
     jobs = []
     for _ in range(process_num):
-        job = p.map_async(partial(put_to_queue, some_q=q), ner_result_generator)
+        job = p.apply_async(put_to_queue, args=(ner_result_generator, q))
         jobs.append(job)
 
     # collect workers
