@@ -73,10 +73,12 @@ def compute_ner_for_clinical_trails_multi_process(nrows,
             ct_text_rows)
 
     # collect workders
+    print("collecting workers")
     for job in jobs:
         job.get()
 
     # send ending signal
+    print("sending end signal")
     some_q.put(None)
 
     # returns in some_q
@@ -131,8 +133,7 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
         nrows, 
         key_column_name, 
         process_num, 
-        p, 
-        q)
+        p, q)
     
     # finished
     p.close()
