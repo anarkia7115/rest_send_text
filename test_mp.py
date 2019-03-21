@@ -49,16 +49,13 @@ class TestMultiProcess(unittest.TestCase):
 
         # start up worker (put data into queue)
         print("starting worker")
-        
+
         p.map(
             partial(
                 self.dummy_worker, 
                 some_q=q), 
             range(10)
         )
-
-        for job in jobs:
-            job.get()
 
         # merge
         print("job finished!")
