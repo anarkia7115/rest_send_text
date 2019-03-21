@@ -5,7 +5,8 @@ import time
 from functools import partial
 import pipeline
 
-STOP_SIGNAL="KILL"
+STOP_SIGNAL = "KILL"
+PROCESS_NUM = 12
 
 class TestMultiProcess(unittest.TestCase): 
 
@@ -30,7 +31,7 @@ class TestMultiProcess(unittest.TestCase):
     
     def test_mp_compute_ner(self):
         # initialize
-        process_num = 6
+        process_num = PROCESS_NUM
 
         manager = mp.Manager()
         q = manager.Queue()
@@ -58,7 +59,7 @@ class TestMultiProcess(unittest.TestCase):
 
     def test_mp_write_to_one_file(self):
         # initialize
-        process_num = 3
+        process_num = PROCESS_NUM
 
         manager = mp.Manager()
         q = manager.Queue()
