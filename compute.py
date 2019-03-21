@@ -39,7 +39,7 @@ def get_ner(text, port=config["SABER"]["port"]):
     print("--- %s seconds in ner ---" % (time.time() - start_time))
     return ner_result
 
-def process_clinical_trails_row(
+def ner_for_row(
     row, 
     key_column_name, 
     predictor, 
