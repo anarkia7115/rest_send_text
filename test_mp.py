@@ -58,7 +58,7 @@ class TestMultiProcess(unittest.TestCase):
 
     def test_mp_write_to_one_file(self):
         # initialize
-        process_num = 6
+        process_num = 12
 
         manager = mp.Manager()
         q = manager.Queue()
