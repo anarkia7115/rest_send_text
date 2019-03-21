@@ -3,7 +3,6 @@ import multiprocessing as mp
 from multiprocessing import Pool, Queue
 import time
 from functools import partial
-import timeout_decorator
 
 STOP_SIGNAL="KILL"
 
