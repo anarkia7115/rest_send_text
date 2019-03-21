@@ -98,5 +98,8 @@ class TestMultiProcess(unittest.TestCase):
         q.put(STOP_SIGNAL)
         listener_process.join()
 
+    def test_hello_world(self):
+        print("hello, world!")
+
         
 
