@@ -35,7 +35,9 @@ class TestMultiProcess(unittest.TestCase):
 
         # initialize
         process_num = 2
-        q = mp.Queue()
+
+        manager = mp.Manager()
+        q = manager.Queue()
         p = Pool(process_num)
 
         # start up listener (file writer)
