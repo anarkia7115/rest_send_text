@@ -49,12 +49,7 @@ class TestMultiProcess(unittest.TestCase):
 
         # start up worker (put data into queue)
         print("starting worker")
-        jobs = []
-
-        for i in range(2):
-            job = p.apply_async(self.dummy_worker, (i, q))
-            jobs.append(job)
-
+        
         p.map(
             partial(
                 self.dummy_worker, 
