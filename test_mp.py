@@ -58,7 +58,7 @@ class TestMultiProcess(unittest.TestCase):
             partial(
                 self.dummy_worker, 
                 some_q=q), 
-            [1]
+            range(10)
         )
 
         for job in jobs:
