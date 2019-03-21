@@ -4,8 +4,7 @@ import configparser
 import compute
 import json
 import multiprocessing as mp
-from multiprocessing.pool import Pool
-from multiprocessing.queues import Queue
+from multiprocessing import Pool
 from functools import partial
 import data_helpers
 
@@ -13,7 +12,7 @@ config = configparser.ConfigParser()
 config.read("./config.ini")
 
 
-def compute_ner_for_clinical_trails(nrows, 
+def load_compute_ner(nrows, 
         key_column_name, 
         predictor=compute.get_ner):
     """
@@ -30,7 +29,7 @@ def compute_ner_for_clinical_trails(nrows,
 
     for row in ct_text_rows:
 
-        row_key, predicted_ners = compute.process_clinical_trails_row(
+        row_key, predicted_ners = compute.ner_for_row(
             row, key_column_name, predictor
         )
         assert row_key is not None
@@ -43,7 +42,7 @@ def compute_ner_for_clinical_trails(nrows,
             "ner": predicted_ners
         }
 
-def compute_ner_for_clinical_trails_multi_process(
+def load_compute_ner_multi_process(
         nrows, 
         key_column_name,
         process_pool:Pool, 
@@ -66,7 +65,7 @@ def compute_ner_for_clinical_trails_multi_process(
     print("job started!")
     process_pool.map(
         partial(
-            compute.process_clinical_trails_row, 
+            compute.ner_for_row, 
             key_column_name=key_column_name,
             predictor=predictor, 
             some_q=some_q), 
@@ -87,7 +86,7 @@ def save_clinical_trails_ner_to_file(nrows=999):
     ner_json_path = config["PATHS"]["ner_json"]
 
     key_column_name = 'nct_id'
-    ner_result_generator = compute_ner_for_clinical_trails(
+    ner_result_generator = load_compute_ner(
         nrows=nrows, 
         key_column_name=key_column_name
     )
@@ -104,11 +103,15 @@ def put_to_queue(data_generator, some_q):  # worker
     print("record put!")
 
 def get_from_queue_and_write(some_q, output_file_path):  # listener
-    with open(output_file_path, 'w') as f_json_output:
-
+    f_json_output = open(output_file_path, 'w')
+        
+    while True:
         ner_result = some_q.get()
-        while ner_result is not None:
-            f_json_output.write(json.dumps(ner_result) + "\n")
+        if ner_result is None:
+            break
+        f_json_output.write(json.dumps(ner_result) + "\n")
+        f_json_output.flush()
+    f_json_output.close()
 
 def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
     print("using multiprocess, process_number is {}".format(args.process_num))
@@ -117,8 +120,8 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
 
     key_column_name = 'nct_id'
 
-    manager = mp.Manager()
     p = Pool(process_num)
+    manager = mp.Manager()
     q = manager.Queue()
 
     # start up listener
@@ -126,7 +129,7 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
     p.apply_async(get_from_queue_and_write, args=(q, ner_json_path))
 
     # start up worker
-    compute_ner_for_clinical_trails_multi_process(
+    load_compute_ner_multi_process(
         nrows, 
         key_column_name, 
         p, q)
@@ -139,7 +142,7 @@ if __name__ == "__main__":
     import multiprocessing, logging
     mpl = multiprocessing.log_to_stderr()
     mpl.setLevel(logging.INFO)
-    # save_clinical_trails_ner_to_file()
+
     import sys
     import argparse
 
