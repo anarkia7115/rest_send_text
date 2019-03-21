@@ -42,7 +42,7 @@ def load_compute_ner(nrows,
             "ner": predicted_ners
         }
 
-def load_compute_ner_multi_process(
+def load_and_compute_ner_multi_process(
         nrows, 
         key_column_name,
         process_pool:Pool, 
@@ -102,12 +102,13 @@ def put_to_queue(data_generator, some_q):  # worker
     some_q.put(one_record)
     print("record put!")
 
-def get_from_queue_and_write(some_q, output_file_path):  # listener
+def get_from_queue_and_write(some_q, output_file_path, stop_signal):  # listener
     f_json_output = open(output_file_path, 'w')
-        
+    print("start listener")
     while True:
+        print("waiting from q")
         ner_result = some_q.get()
-        if ner_result is None:
+        if ner_result == stop_signal:
             break
         f_json_output.write(json.dumps(ner_result) + "\n")
         f_json_output.flush()
@@ -129,7 +130,7 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
     p.apply_async(get_from_queue_and_write, args=(q, ner_json_path))
 
     # start up worker
-    load_compute_ner_multi_process(
+    load_and_compute_ner_multi_process(
         nrows, 
         key_column_name, 
         p, q)

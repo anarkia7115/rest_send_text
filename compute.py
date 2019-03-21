@@ -77,6 +77,7 @@ def ner_for_row(
         }
 
     if some_q is not None:
+        print("put result to q")
         some_q.put(return_json)
     else:
         return return_json

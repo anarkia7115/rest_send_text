@@ -47,8 +47,8 @@ class TestMultiProcess(unittest.TestCase):
         print("starting worker")
         nrows = 100
         key_column_name = 'nct_id'
-        pipeline.load_and_compute_ner_multi_process(nrows, key_column_name, p, q)
 
+        pipeline.load_and_compute_ner_multi_process(nrows, key_column_name, p, q)
         # merge
         print("job finished!")
         print("sending end signal")
