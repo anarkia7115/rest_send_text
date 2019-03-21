@@ -22,7 +22,6 @@ class TestMultiProcess(unittest.TestCase):
             print("waiting~")
             m = some_q.get()
             if m == STOP_SIGNAL:
-                f.write('killed')
                 break
             f.write(str(m) + '\n')
             f.flush()
@@ -34,7 +33,7 @@ class TestMultiProcess(unittest.TestCase):
         mpl.setLevel(multiprocessing.SUBDEBUG)
 
         # initialize
-        process_num = 2
+        process_num = 6
 
         manager = mp.Manager()
         q = manager.Queue()
@@ -42,7 +41,7 @@ class TestMultiProcess(unittest.TestCase):
 
         # start up listener (file writer)
         print("starting listener")
-        output_file = "./test_mp_write"
+        output_file = "./data/test_mp_write1"
         from pipeline import get_from_queue_and_write
         watcher = p.apply_async(
             self.dummy_listener, 
@@ -74,7 +73,7 @@ class TestMultiProcess(unittest.TestCase):
         p.join()
 
     def test_process_write(self):
-        output_file = "./test_mp_write"
+        output_file = "./data/test_mp_write2"
         i = 123
         q = mp.Queue()
 
