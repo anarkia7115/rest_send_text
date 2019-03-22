@@ -4,9 +4,16 @@ from multiprocessing import Pool, Queue
 import time
 from functools import partial
 import pipeline
+import configparser
+
+config = configparser.ConfigParser()
+config.read("./config.ini")
 
 STOP_SIGNAL = "KILL"
-PROCESS_NUM = 12
+PROCESS_NUM = config["SABER"]["process_num"]
+mp_test_dummy_path = config["PATH"]["mp_test_dummy"]
+mp_test_ner = config["PATH"]["mp_test_ner"]
+
 
 class TestMultiProcess(unittest.TestCase): 
 
@@ -39,7 +46,7 @@ class TestMultiProcess(unittest.TestCase):
 
         # start up listener (file writer)
         print("starting listener")
-        output_file = "./data/test_mp_write1"
+        output_file = mp_test_ner
         import pipeline
         watcher = p.apply_async(pipeline.get_from_queue_and_write, 
             args=(q, output_file, STOP_SIGNAL))
@@ -67,8 +74,8 @@ class TestMultiProcess(unittest.TestCase):
 
         # start up listener (file writer)
         print("starting listener")
-        output_file = "./data/test_mp_write1"
-        watcher = p.apply_async(pipeline.get_from_queue_and_write, 
+        output_file = mp_test_dummy_path
+        watcher = p.apply_async(self.dummy_listener, 
             args=(q, output_file))
 
         # start up worker (put data into queue)
