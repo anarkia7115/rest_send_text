@@ -18,4 +18,5 @@ class TestCompute(unittest.TestCase):
         self.assertEqual(type(sample_text), str)
 
         ner_result = compute.get_ner(sample_text, port=config["SABER"]["port"])
-        # print(ner_result)
+        from pprint import pprint
+        pprint(ner_result)
