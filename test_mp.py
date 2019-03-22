@@ -10,7 +10,7 @@ config = configparser.ConfigParser()
 config.read("./config.ini")
 
 STOP_SIGNAL = "KILL"
-PROCESS_NUM = config["SABER"]["process_num"]
+PROCESS_NUM = int(config["SABER"]["process_num"])
 mp_test_dummy_path = config["PATHS"]["mp_test_dummy"]
 mp_test_ner = config["PATHS"]["mp_test_ner"]
 
