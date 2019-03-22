@@ -11,11 +11,11 @@ config.read("./config.ini")
 
 STOP_SIGNAL = "KILL"
 PROCESS_NUM = config["SABER"]["process_num"]
-mp_test_dummy_path = config["PATH"]["mp_test_dummy"]
-mp_test_ner = config["PATH"]["mp_test_ner"]
+mp_test_dummy_path = config["PATHS"]["mp_test_dummy"]
+mp_test_ner = config["PATHS"]["mp_test_ner"]
 
 
-class TestMultiProcess(unittest.TestCase): 
+class TestListenerWorker(unittest.TestCase): 
 
     @staticmethod
     def dummy_worker(content, some_q):
@@ -64,7 +64,7 @@ class TestMultiProcess(unittest.TestCase):
         p.close()
         p.join()
 
-    def test_mp_write_to_one_file(self):
+    def test_mp_dummpy(self):
         # initialize
         process_num = PROCESS_NUM
 
