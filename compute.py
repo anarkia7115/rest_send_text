@@ -40,7 +40,7 @@ def get_ner(text, port=config["SABER"]["port"]):
     except json.decoder.JSONDecodeError:
         print("cannot parse request:")
         pprint(r)
-        pprint(r.get_data())
+        pprint(r.text)
         raise
     
     print("--- %s seconds in ner ---" % (time.time() - start_time))
