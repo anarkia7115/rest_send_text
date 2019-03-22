@@ -41,7 +41,7 @@ class TestListenerWorker(unittest.TestCase):
         process_num = PROCESS_NUM
 
         manager = mp.Manager()
-        q = manager.Queue()
+        q = manager.Queue(maxsize=PROCESS_NUM*2)
         p = Pool(process_num)
 
         # start up listener (file writer)
@@ -69,7 +69,7 @@ class TestListenerWorker(unittest.TestCase):
         process_num = PROCESS_NUM
 
         manager = mp.Manager()
-        q = manager.Queue()
+        q = manager.Queue(maxsize=PROCESS_NUM*2)
         p = Pool(process_num)
 
         # start up listener (file writer)
@@ -92,7 +92,7 @@ class TestListenerWorker(unittest.TestCase):
     def test_process_write(self):
         output_file = "./data/test_mp_write2"
         i = 123
-        q = mp.Queue()
+        q = mp.Queue(maxsize=PROCESS_NUM*2)
 
         listener_process = mp.Process(target=self.dummy_listener, args=(q, output_file))
         worker_process = mp.Process(target=self.dummy_worker, args=(i, q))
