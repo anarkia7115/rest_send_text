@@ -4,6 +4,7 @@ import requests, json
 import postprocess
 from multiprocessing import Queue
 import multiprocessing as mp
+from pprint import pprint
 
 
 config = configparser.ConfigParser()
@@ -34,7 +35,11 @@ def get_ner(text, port=config["SABER"]["port"]):
     
     r = requests.post(url=URL, data=json.dumps(input_data), headers=headers) 
     # r.status_code
-    ner_result = r.json() 
+    try:
+        ner_result = r.json() 
+    except json.decoder.JSONDecodeError:
+        print("cannot parse request:")
+        pprint(r)
     
     print("--- %s seconds in ner ---" % (time.time() - start_time))
     return ner_result
