@@ -41,6 +41,7 @@ def get_ner(text, port=config["SABER"]["port"]):
         print("cannot parse request:")
         pprint(r)
         pprint(r.text)
+        ner_result = None
         # TODO: improve error handling
     
     print("--- %s seconds in ner ---" % (time.time() - start_time))
