@@ -14,4 +14,7 @@ def ner_result_format(ner_result):
             |- label (DISO, PRGE, CHED)
             |- text
     """
-    return ner_result['ents']
+    if ner_result is None:
+        return None
+    else:
+        return ner_result['ents']
