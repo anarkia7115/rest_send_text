@@ -11,6 +11,7 @@ import data_helpers
 config = configparser.ConfigParser()
 config.read("./config.ini")
 
+STOP_SIGNAL="KILL"
 
 def load_compute_ner(nrows, 
         key_column_name, 
@@ -110,7 +111,11 @@ def get_from_queue_and_write(some_q, output_file_path, stop_signal):  # listener
         ner_result = some_q.get()
         if ner_result == stop_signal:
             break
-        f_json_output.write(json.dumps(ner_result) + "\n")
+        try:
+            f_json_output.write(json.dumps(ner_result) + "\n")
+        except Exception as e:
+            print("Error when parsing json, just pass: "+str(e))
+            pass
         f_json_output.flush()
     f_json_output.close()
 
@@ -127,7 +132,7 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
 
     # start up listener
     print("start listener")
-    p.apply_async(get_from_queue_and_write, args=(q, ner_json_path))
+    p.apply_async(get_from_queue_and_write, args=(q, ner_json_path, STOP_SIGNAL))
 
     # start up worker
     load_and_compute_ner_multi_process(
@@ -136,6 +141,7 @@ def save_clinical_trails_ner_to_file_multi_process(nrows=999, process_num=1):
         p, q)
     
     # finished
+    q.put(STOP_SIGNAL)
     p.close()
 
 
