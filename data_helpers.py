@@ -30,7 +30,7 @@ def map_dict_value(row, key_column_name, map_func):
 
         assert row_key is not None
 
-        return row_key, mapped_row
+    return row_key, mapped_row
 
 def json_record_to_bioc(row_content):
     bioc_str = (
