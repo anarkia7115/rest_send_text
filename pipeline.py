@@ -30,7 +30,7 @@ def load_compute_ner(nrows,
 
     for row in ct_text_rows:
 
-        row_key, predicted_ners = compute.ner_for_row(
+        row_key, predicted_ners = compute.map_json_records(
             row, key_column_name, predictor
         )
         assert row_key is not None
@@ -66,7 +66,7 @@ def load_and_compute_ner_multi_process(
     print("job started!")
     process_pool.map(
         partial(
-            compute.ner_for_row, 
+            compute.map_json_records, 
             key_column_name=key_column_name,
             predictor=predictor, 
             some_q=some_q), 
