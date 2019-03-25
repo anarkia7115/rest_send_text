@@ -34,8 +34,8 @@ def map_dict_value(row, key_column_name, map_func):
 
 def json_record_to_bioc(row_content):
     bioc_str = (
-        "{row_id}.{col_name}|t|\n"
-        "{row_id}.{col_name}|a|{row_content}\n"
+        "{{row_id}}.{{col_name}}|t|\n"
+        "{{row_id}}.{{col_name}}|a|{row_content}\n"
     
     ).format(row_content=row_content)
     return bioc_str
