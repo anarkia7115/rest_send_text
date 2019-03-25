@@ -57,3 +57,6 @@ def json_records_to_bioc():
             bioc = bioc.format(row_id=row_key, col_name=col_name)
             f_bioc.write(bioc + "\n")
     f_bioc.close()
+
+if __name__ == "__main__":
+    json_records_to_bioc()
