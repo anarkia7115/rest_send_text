@@ -1,6 +1,8 @@
 import configparser
 import pandas as pd
 from pathlib import Path
+import os
+
 
 config = configparser.ConfigParser()
 config.read("./config.ini")
@@ -65,10 +67,15 @@ def keep_text_fileds(rows):
         raise Exception("unknown type of data")
 
 def load_clinical_trails_text(nrows, returntype, sep='\t'):
-    ct = load_clinical_trails(
-        nrows=nrows, 
-        return_type=returntype, 
-        sep=sep
-    )
-    ct_text = keep_text_fileds(ct)
-    return ct_text
+    row_records_file = config["PATH"]["row_records"]
+    if os.path.isfile(row_records_file):
+        import data_helpers
+        return data_helpers.dict_load(row_records_file)
+    else:
+        ct = load_clinical_trails(
+            nrows=nrows, 
+            return_type=returntype, 
+            sep=sep
+        )
+        ct_text = keep_text_fileds(ct)
+        return ct_text
