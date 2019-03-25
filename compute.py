@@ -5,7 +5,7 @@ import postprocess
 from multiprocessing import Queue
 import multiprocessing as mp
 from pprint import pprint
-
+import data_helpers
 
 config = configparser.ConfigParser()
 config.read("./config.ini")
@@ -47,7 +47,8 @@ def get_ner(text, port=config["SABER"]["port"]):
     print("--- %s seconds in ner ---" % (time.time() - start_time))
     return ner_result
 
-def ner_for_row(
+
+def map_json_records(
     row, 
     key_column_name, 
     predictor, 
@@ -67,17 +68,10 @@ def ner_for_row(
     cpname = mp.current_process().name
     # print cpname
     print("{0} is currently doing...".format(cpname))
-
-    predicted_ners = dict()
-    for col_name, col_val in row.items():
-        if col_name == key_column_name:  # is a key to identify row
-            row_key = col_val
-        else:  # is text, predict
-            ner_result = predictor(col_val)  # predict
-            ner_result = postprocess.ner_result_format(ner_result)  # format
-            predicted_ners[col_name] = ner_result
-
-    assert row_key is not None
+    row_key, predicted_ners = data_helpers.map_dict_value(
+        row, 
+        key_column_name, 
+        lambda x: postprocess.ner_result_format(predictor(x)))
 
     return_json = {
             key_column_name: row_key, 
