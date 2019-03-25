@@ -33,11 +33,11 @@ def map_dict_value(row, key_column_name, map_func):
     return row_key, mapped_row
 
 def json_record_to_bioc(row_content):
-    bioc_str = (
-        "{{row_id}}.{{col_name}}|t|\n"
-        "{{row_id}}.{{col_name}}|a|{row_content}\n"
-    
-    ).format(row_content=row_content.replace("{{", "").replace("}}", ""))
+    bioc_str = \
+        "{row_id}.{col_name}|t|\n" +\
+        "{row_id}.{col_name}|a|" +\
+        row_content.replace("{{", "").replace("}}", "") +\
+        "\n"
     return bioc_str
 
 def json_records_to_bioc():
