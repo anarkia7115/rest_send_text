@@ -37,7 +37,7 @@ def json_record_to_bioc(row_content):
         "{{row_id}}.{{col_name}}|t|\n"
         "{{row_id}}.{{col_name}}|a|{row_content}\n"
     
-    ).format(row_content=row_content)
+    ).format(row_content=row_content.replace("{{", "").replace("}}", ""))
     return bioc_str
 
 def json_records_to_bioc():
