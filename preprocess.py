@@ -67,7 +67,7 @@ def keep_text_fileds(rows):
         raise Exception("unknown type of data")
 
 def load_clinical_trails_text(nrows, returntype, sep='\t'):
-    row_records_file = config["PATH"]["row_records"]
+    row_records_file = config["PATHS"]["row_records"]
     if os.path.isfile(row_records_file):
         import data_helpers
         return data_helpers.dict_load(row_records_file)
