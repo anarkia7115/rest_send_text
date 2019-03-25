@@ -51,9 +51,11 @@ def json_records_to_bioc():
 
     f_bioc = open(bioc_file, 'w')
     for row_dict in row_dict_generator:
+        print("getting row")
         row_key, bioc_by_colname= map_dict_value(
             row_dict, key_column_name, json_record_to_bioc)
         for col_name, bioc in bioc_by_colname.items():
+            print("getting item")
             bioc = bioc.format(row_id=row_key, col_name=col_name)
             f_bioc.write(bioc + "\n")
     f_bioc.close()
