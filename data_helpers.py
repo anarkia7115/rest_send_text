@@ -2,11 +2,13 @@
 Data Helper
 
 """
+import json
+import re
+
 import configparser
 config = configparser.ConfigParser()
 config.read("./config.ini")
 
-import json
 def dict_save(row_generator, output_file):
     with open(output_file, 'w') as fw:
         for row in row_generator:
@@ -40,31 +42,29 @@ def json_record_to_bioc(row_content):
         "\n"
     return bioc_str
 
-def json_records_to_bioc():
-    """
-    dict rows to bioc format, for tmVar
-    """
-    json_records_file = config["PATHS"]["json_records"]
-    bioc_file = config["PATHS"]["bioc"]
-    key_column_name = "nct_id"
-    row_dict_generator = dict_load(json_records_file)
+def bioc_to_json_records(input_line):
+    sep = "\t"
+    inner_sep = "."
+    if sep not in input_line:
+        return None
 
-    f_bioc = open(bioc_file, 'w')
-    for row_dict in row_dict_generator:
-        print("getting row")
-        row_key, bioc_by_colname= map_dict_value(
-            row_dict, key_column_name, json_record_to_bioc)
-        for col_name, bioc in bioc_by_colname.items():
-            print("getting item")
-            try:
-                bioc = bioc.format(
-                    row_id=row_key, col_name=col_name)
-            except IndexError:
-                print("bioc:{}\nrow_id:{}\ncol_name:{}\n".format(
-                    bioc, row_key, col_name))
-                raise
-            f_bioc.write(bioc + "\n")
-    f_bioc.close()
+    var_ner = dict()
+
+    var_ner["ntc_id"] = input_line.split(sep)[0].split(inner_sep)[0]
+    var_ner["ner"] = dict()
+    var_ner["ner"][input_line.split(sep)[0].split(inner_sep)[1]] = []
+
+    ner_dict = dict()
+    ner_dict["start"] = input_line.split(sep)[1]
+    ner_dict["end"] = input_line.split(sep)[2]
+    ner_dict["text"] = input_line.split(sep)[3]
+    ner_dict["label"] = input_line.split(sep)[4]
+    ner_dict["normed"] = input_line.split(sep)[5]
+
+    var_ner["ner"][input_line.split(sep)[0].split(inner_sep)[1]].append(ner_dict)
+
+    return var_ner
 
 if __name__ == "__main__":
-    json_records_to_bioc()
+    pass
+
